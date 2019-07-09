@@ -1,11 +1,15 @@
 ﻿
+@inject SignInManager<ApplicationUser> SignInManager;
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
     <environment include="Development">
         <link href="~/lib/twitter-bootstrap/css/bootstrap.css" rel="stylesheet" />
         <script src="~/lib/jquery/jquery.js"></script>
+        <script src="~/lib/jquery-validate/jquery.validate.js"></script>
+        <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
         <script src="~/lib/twitter-bootstrap/js/bootstrap.js"></script>
+
     </environment>
     <environment exclude="Development">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
@@ -37,6 +41,34 @@
                     <li class="nav-item">
                         <a class="nav-link" asp-controller="home" asp-action="create">Create</a>
                     </li>
+                    
+                </ul>
+                <ul class="navbar-nav ml-auto">
+                    @if (SignInManager.IsSignedIn(User))
+
+                    {
+                        <li class="nav-item">
+                            <form method="post" asp-action="logout" asp-controller="account">
+
+                                <button type="submit" class="nav-link btn btn-link py-0" style="width:auto">
+                                    Logout @User.Identity.Name
+                                </button>
+                            </form>
+                        </li>
+
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Account" asp-action="Register">Register</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Account" asp-action="login">Login</a>
+                        </li>
+
+
+                    }
+
                 </ul>
             </div>
         </nav>

@@ -8,7 +8,8 @@ using EmployeeManagement.Models;
 using EmployeeManagement.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 using System.IO;
-using Microsoft.AspNetCore.Http; 
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EmployeeManagement.Controllers
 {
@@ -25,8 +26,33 @@ namespace EmployeeManagement.Controllers
             this.hostingEnvironment = hostingEnvironment;
         }
 
-          
+        [HttpGet]
+        public IActionResult jquery()
+        {
+
+            // retrieve all the employees
+            var model = _employeeRepository.GetAllEmployees();
+            // Pass the list of employees to the view
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult jquery(int i=0)
+        {
+
+            // retrieve all the employees
+            var model = _employeeRepository.GetAllEmployees();
+            // Pass the list of employees to the view
+
+            return Json(model);
+        }
+
+
+
+
         // Retrieve employee name and return
+        [AllowAnonymous]
         public ViewResult Index()
         {
             
@@ -44,9 +70,9 @@ namespace EmployeeManagement.Controllers
             if (Employee == null)
             {
                 Response.StatusCode = 404;
-                return View("EmployeeNotFound",id);
+                return View("EmployeeNotFound", id);
             }
-     
+
             // Pass the ViewModel object to the View() helper method
             return View(Employee);
         }

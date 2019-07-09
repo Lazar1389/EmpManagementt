@@ -1,0 +1,53 @@
+﻿@model IEnumerable<Employee>
+@{
+    ViewData["Title"] = "Jquery";
+}
+<
+
+
+<h2>Jquery</h2>
+
+@foreach (var item in Model)
+{
+
+    @item.Department
+    @item.Email
+
+}
+
+<div>
+    <table id="myTable1">
+    <thead>
+        <tr>
+            <th>
+                Id
+            </th>
+            <th>
+                FirstName
+            </th>
+            <th>
+                Last Name
+            </th>
+            <th>
+                Gender
+            </th>
+             <th>
+                Job Title
+            </th>
+            <th>
+                webs
+            </th>
+             <th>
+                pare
+            </th>
+            <th>
+                hireDate
+            </th>
+        </tr>
+    </thead>
+        <tbody>
+
+        </tbody>
+       </table>
+
+</div>

@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EmployeeManagement.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,7 +28,24 @@ namespace EmployeeManagement
         {
             
             services.AddDbContextPool<AppDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("EmployeeDBConnection")) );
-            services.AddMvc();
+            services.AddIdentity<ApplicationUser, IdentityRole>(options => {
+                options.Password.RequiredLength=10;
+                options.Password.RequiredUniqueChars=3;
+                options.Password.RequireNonAlphanumeric = false;
+                })
+                .AddEntityFrameworkStores<AppDbContext>();
+
+
+
+
+            services.AddMvc(config =>
+            {
+                var policy = new AuthorizationPolicyBuilder()
+                                  .RequireAuthenticatedUser()
+                                  .Build();
+                config.Filters.Add(new AuthorizeFilter(policy));
+            });
+
             services.AddScoped<IEmployeeRepository, SQLEmployeeRepository>();
         }
 
@@ -34,15 +54,19 @@ namespace EmployeeManagement
         {
             if (env.IsDevelopment())
             {
-                app.UseBrowserLink();
+                
+                
                 app.UseDeveloperExceptionPage();
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler("/Error");
+                app.UseStatusCodePagesWithReExecute("/Error/{0}");
             }
 
             app.UseStaticFiles();
+
+            app.UseAuthentication();
 
             app.UseMvc(routes =>
             {
