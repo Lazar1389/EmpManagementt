@@ -1,5 +1,4 @@
-﻿
-@inject SignInManager<ApplicationUser> SignInManager;
+﻿@inject SignInManager<ApplicationUser> SignInManager;
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
@@ -55,7 +54,10 @@
                                    asp-action="ListRoles">Roles</a>
                             </div>
                         </li>
-                    }
+                    } 
+
+                    <li class="nav-item"><a class="nav-link" asp-action="Index" asp-controller="Linq">LINQ</a> </li>
+                  
 
                 </ul>
                 <ul class="navbar-nav ml-auto">

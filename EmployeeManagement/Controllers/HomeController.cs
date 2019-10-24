@@ -77,6 +77,7 @@ namespace EmployeeManagement.Controllers
             return View(Employee);
         }
         [HttpGet]
+
         public ViewResult Create()
         {
 
