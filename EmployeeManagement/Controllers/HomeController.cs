@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Hosting;
 using System.IO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
+using EmployeeManagement.Security;
 
 namespace EmployeeManagement.Controllers
 {
@@ -17,13 +19,18 @@ namespace EmployeeManagement.Controllers
     {
         private IEmployeeRepository _employeeRepository;
         private readonly IHostingEnvironment hostingEnvironment;
+        private readonly IDataProtector protector;
 
         // Inject IEmployeeRepository using Constructor Injection
         public HomeController(IEmployeeRepository employeeRepository,
-                            IHostingEnvironment hostingEnvironment)
+                            IHostingEnvironment hostingEnvironment,
+                            IDataProtectionProvider dataProtectionProvider,
+                            DataProtectionPurposeStrings dataProtectionPurposeStrings)
         {
             _employeeRepository = employeeRepository;
             this.hostingEnvironment = hostingEnvironment;
+
+            protector = dataProtectionProvider.CreateProtector(dataProtectionPurposeStrings.EmployeeIdRouteValue);
         }
 
         [HttpGet]
@@ -57,20 +64,26 @@ namespace EmployeeManagement.Controllers
         {
             
             // retrieve all the employees
-            var model = _employeeRepository.GetAllEmployees();
+            var model = _employeeRepository.GetAllEmployees()
+                .Select(e =>
+                { 
+                    e.EncryptedId = protector.Protect(e.Id.ToString());
+                    return e;
+                    });
             // Pass the list of employees to the view
             
             return View(model);
         }
         
-        public ViewResult Details(int id)
+        public ViewResult Details(string id)
         {
+            int employeeId = Convert.ToInt32(protector.Unprotect(id));
 
-            Employee Employee = _employeeRepository.GetEmployee(id);
+            Employee Employee = _employeeRepository.GetEmployee(employeeId);
             if (Employee == null)
             {
                 Response.StatusCode = 404;
-                return View("EmployeeNotFound", id);
+                return View("EmployeeNotFound", employeeId);
             }
 
             // Pass the ViewModel object to the View() helper method

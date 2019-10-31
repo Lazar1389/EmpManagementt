@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EmployeeManagement.Models;
+using EmployeeManagement.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -33,12 +34,20 @@ namespace EmployeeManagement
                 options.Password.RequiredLength=10;
                 options.Password.RequiredUniqueChars=3;
                 options.SignIn.RequireConfirmedEmail = true;
+                options.Tokens.EmailConfirmationTokenProvider = "CustomEmailConfirmation";
                 options.Password.RequireNonAlphanumeric = false;
                 })
-                .AddEntityFrameworkStores<AppDbContext>();
+                .AddEntityFrameworkStores<AppDbContext>()
+                .AddDefaultTokenProviders()
+                .AddTokenProvider<CustomEmailConfirmationTokenProvider<ApplicationUser>>("CustomEmailConfirmation");
 
 
+            services.Configure<DataProtectionTokenProviderOptions>(o=>o.TokenLifespan = TimeSpan.FromHours(5));
+            
+            services.Configure<CustomEmailConfirmationTokenProviderOptions>(o=>
+            o.TokenLifespan = TimeSpan.FromDays(3));
 
+            
 
             services.AddMvc(config =>
             {
@@ -46,7 +55,7 @@ namespace EmployeeManagement
                                   .RequireAuthenticatedUser()
                                   .Build();
                 config.Filters.Add(new AuthorizeFilter(policy));
-            }); 
+            }).AddXmlSerializerFormatters(); 
 
             services.AddAuthentication()
                 .AddGoogle(options => { 
@@ -81,7 +90,10 @@ namespace EmployeeManagement
                     policy => policy.RequireClaim("Admin"));
                 }); 
             services.AddScoped<IEmployeeRepository, SQLEmployeeRepository>();
-        }
+        
+            services.AddSingleton<DataProtectionPurposeStrings>();
+            
+            }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
