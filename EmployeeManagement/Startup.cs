@@ -28,7 +28,7 @@ namespace EmployeeManagement
         public void ConfigureServices(IServiceCollection services)
         {
            // services.AddEntityFrameworkSqlServer();
-            
+            //
             services.AddDbContextPool<AppDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("EmployeeDBConnection")) );
             services.AddIdentity<ApplicationUser, IdentityRole>(options => {
                 options.Password.RequiredLength=10;
